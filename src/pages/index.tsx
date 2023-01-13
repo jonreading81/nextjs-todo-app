@@ -27,10 +27,13 @@ export default function Home(props: HomeProps) {
             type="text"
             placeholder="Add your name"
             value={todoName}
-            onChange={(e) => setTodoName(e.target.value)}
+            onChange={(e) => {
+              setTodoName(e.target.value);
+            }}
           ></styles.textInput>
           <styles.button
             disabled={todoName === ""}
+            aria-label="Add Todo"
             onClick={async (event) => {
               event.preventDefault();
               setTodoName("");
