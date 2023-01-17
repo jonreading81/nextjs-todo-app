@@ -5,7 +5,7 @@ import { Todo, fetchTodos } from "../services/todos";
 
 import * as styles from "../styles/Home.styles";
 
-interface HomeProps {
+export interface HomeProps {
   todos: Todo[];
 }
 
@@ -48,10 +48,14 @@ export default function Home(props: HomeProps) {
         <styles.title as="h2">Todos</styles.title>
         <ul>
           {todos.map((todo) => {
+            const checboxLabel = `${todo.name} On selection the status will be changed.`;
+
             return (
               <styles.todo key={todo._id}>
                 <input
                   type="checkbox"
+                  aria-label={checboxLabel}
+                  title={checboxLabel}
                   checked={todo.status}
                   onChange={(event) => {
                     event.preventDefault();
