@@ -6,17 +6,10 @@ import { GetServerSidePropsContext } from "next";
 
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import Home, { getServerSideProps, HomeProps } from "../../src/pages/index";
+import { Todos, TodosProps } from "./todos";
 import { todos } from "../../__data__/todos";
-import { notDeepEqual } from "assert";
 
 const server = setupServer(
-  rest.post(
-    "https://altogic.com/_api/rest/v1/db/get-list",
-    async (req, res, ctx) => {
-      return res(ctx.json(todos));
-    }
-  ),
   rest.post<{
     values: {
       name: string;
@@ -62,24 +55,15 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-const getProps = async () => {
-  const { props } = (await getServerSideProps(
-    {} as GetServerSidePropsContext
-  )) as { props: HomeProps };
-  return props;
-};
-
 test("should be able to display a list of todos", async () => {
-  const props = await getProps();
+  render(<Todos todos={todos} />);
 
-  render(<Home {...props} />);
-
-  expect(screen.getByText(props.todos[0].name)).toBeInTheDocument();
-  expect(screen.getByText(props.todos[1].name)).toBeInTheDocument();
+  expect(screen.getByText(todos[0].name)).toBeInTheDocument();
+  expect(screen.getByText(todos[1].name)).toBeInTheDocument();
 });
 
 test("should be able to add a todo to the list", async () => {
-  render(<Home todos={[]} />);
+  render(<Todos todos={[]} />);
 
   const todoName = "my todo";
   const button = screen.getByRole("button", { name: "Add Todo" });
@@ -96,26 +80,22 @@ test("should be able to add a todo to the list", async () => {
 });
 
 test("should be able to delete a todo from the list", async () => {
-  const props = await getProps();
+  render(<Todos todos={todos} />);
 
-  render(<Home todos={todos} />);
-
-  expect(screen.getByText(props.todos[0].name)).toBeInTheDocument();
-  expect(screen.getByText(props.todos[1].name)).toBeInTheDocument();
+  expect(screen.getByText(todos[0].name)).toBeInTheDocument();
+  expect(screen.getByText(todos[1].name)).toBeInTheDocument();
 
   await userEvent.click(screen.getAllByRole("button", { name: "Delete" })[0]);
 
   await waitFor(() => {
-    expect(screen.queryByText(props.todos[0].name)).not.toBeInTheDocument();
+    expect(screen.queryByText(todos[0].name)).not.toBeInTheDocument();
   });
 });
 
 test("should be able to change the status of a todo", async () => {
-  const props = await getProps();
+  render(<Todos todos={todos} />);
 
-  render(<Home todos={todos} />);
-
-  const checkboxLabel = `${props.todos[0].name} On selection the status will be changed.`;
+  const checkboxLabel = `${todos[0].name} On selection the status will be changed.`;
 
   expect(screen.getByLabelText(checkboxLabel)).not.toBeChecked();
 

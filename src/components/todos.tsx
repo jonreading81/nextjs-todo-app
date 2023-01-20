@@ -1,28 +1,26 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { GetServerSideProps } from "next";
+
 import { useTodos } from "../hooks/todos";
-import { Todo, fetchTodos } from "../services/todos";
+import { Todo } from "../services/todos";
 
-import * as styles from "../styles/Home.styles";
-
-export interface HomeProps {
+export interface TodosProps {
   todos: Todo[];
 }
 
-export default function Home(props: HomeProps) {
+export const Todos = (props: TodosProps) => {
   const { todos, addTodo, deleteTodo, toggleStatusTodo } = useTodos(
     props.todos
   );
   const [todoName, setTodoName] = useState("");
 
   return (
-    <styles.container>
+    <div>
       <form>
-        <styles.title as="label" htmlFor="name">
-          Add a new todo
-        </styles.title>
-        <styles.formGroup>
-          <styles.textInput
+        <h2>Add a new todo</h2>
+        <div>
+          <input
             id="name"
             type="text"
             placeholder="Add your name"
@@ -30,8 +28,8 @@ export default function Home(props: HomeProps) {
             onChange={(e) => {
               setTodoName(e.target.value);
             }}
-          ></styles.textInput>
-          <styles.button
+          ></input>
+          <button
             disabled={todoName === ""}
             aria-label="Add Todo"
             onClick={async (event) => {
@@ -41,17 +39,17 @@ export default function Home(props: HomeProps) {
             }}
           >
             Submit
-          </styles.button>
-        </styles.formGroup>
+          </button>
+        </div>
       </form>
       <div>
-        <styles.title as="h2">Todos</styles.title>
+        <h2>Todos</h2>
         <ul>
           {todos.map((todo) => {
             const checboxLabel = `${todo.name} On selection the status will be changed.`;
 
             return (
-              <styles.todo key={todo._id}>
+              <li key={todo._id}>
                 <input
                   type="checkbox"
                   aria-label={checboxLabel}
@@ -65,25 +63,19 @@ export default function Home(props: HomeProps) {
                 <h3>{todo.name}</h3>
 
                 <time>{new Date(todo.dateTime).toLocaleDateString()}</time>
-                <styles.button
+                <button
                   onClick={async (event) => {
                     event.preventDefault();
                     deleteTodo(todo._id);
                   }}
                 >
                   Delete
-                </styles.button>
-              </styles.todo>
+                </button>
+              </li>
             );
           })}
         </ul>
       </div>
-    </styles.container>
+    </div>
   );
-}
-
-export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
-  const { data, errors } = await fetchTodos();
-
-  return { props: { todos: data ?? [] } };
 };
